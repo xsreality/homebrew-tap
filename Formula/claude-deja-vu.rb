@@ -1,8 +1,8 @@
 class ClaudeDejaVu < Formula
   desc "Search and browse your Claude Code conversation history"
   homepage "https://github.com/xsreality/claude-deja-vu"
-  url "https://github.com/xsreality/claude-deja-vu/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "678100aa204e1465c34862fa4f1df8791fc2420baf2e31c748bb52800d40ce0d"
+  url "https://github.com/xsreality/claude-deja-vu/archive/refs/tags/v0.1.1.tar.gz"
+  sha256 "0f9dee22359a773fb65a2250b219553c7fd377f7204c0479f453a8275fffa92c"
   license "MIT"
 
   depends_on macos: :sonoma
