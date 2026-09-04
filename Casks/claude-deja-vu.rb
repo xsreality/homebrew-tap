@@ -1,6 +1,6 @@
 cask "claude-deja-vu" do
-  version "0.1.1"
-  sha256 "e0f0365365b072abf554d884effb066a06c48a7d37ff17ebf9f9cccb07ab3a69"
+  version "0.1.2"
+  sha256 "2e5e5bdac67bf3978685138f0df3d6f50083f97a44d3cfa7d05c904e4c23d1ea"
 
   url "https://github.com/xsreality/claude-deja-vu/releases/download/v#{version}/ClaudeDejaVu-#{version}.dmg"
   name "Claude Déjà Vu"
