@@ -12,7 +12,7 @@ class ClaudeDejaVu < Formula
     prefix.install "build/DejaVu.app"
     (bin/"dejavu").write <<~SH
       #!/bin/bash
-      exec open -a "#{prefix}/DejaVu.app"
+      exec open -a "#{opt_prefix}/DejaVu.app"
     SH
   end
 
