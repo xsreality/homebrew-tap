@@ -1,0 +1,52 @@
+name: Update cask
+
+# Follows claude-deja-vu's releases. No cross-repo token: this runs in the tap
+# and pushes to itself, so a schedule is all it needs. Run it by hand to pick up
+# a release immediately.
+on:
+  schedule:
+    - cron: "23 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned to a commit, not a tag: a tag can be moved, a commit cannot.
+      - name: Check out
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.0.0
+
+      - name: Bump to the latest verified release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPSTREAM: xsreality/claude-deja-vu
+          CASK: Casks/claude-deja-vu.rb
+        run: |
+          set -euo pipefail
+          tag="$(gh release view --repo "$UPSTREAM" --json tagName -q .tagName)"
+          version="${tag#v}"
+          current="$(sed -n 's/^  version "\(.*\)"$/\1/p' "$CASK")"
+          if [ "$version" = "$current" ]; then
+            echo "cask is already at $version"
+            exit 0
+          fi
+
+          dmg="ClaudeDejaVu-$version.dmg"
+          gh release download "$tag" --repo "$UPSTREAM" --pattern "$dmg" --dir /tmp
+
+          # The gate: pin these bytes only if they provably came from UPSTREAM's
+          # release workflow. A DMG swapped into the release fails here, and the
+          # cask keeps pointing at the last good version.
+          gh attestation verify "/tmp/$dmg" --repo "$UPSTREAM"
+
+          sha="$(sha256sum "/tmp/$dmg" | cut -d' ' -f1)"
+          sed -i -e "s|^  version \".*\"$|  version \"$version\"|" \
+                 -e "s|^  sha256 \".*\"$|  sha256 \"$sha\"|" "$CASK"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "claude-deja-vu $version"
+          git push
