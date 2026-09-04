@@ -39,8 +39,12 @@ jobs:
 
           # The gate: pin these bytes only if they provably came from UPSTREAM's
           # release workflow. A DMG swapped into the release fails here, and the
-          # cask keeps pointing at the last good version.
-          gh attestation verify "/tmp/$dmg" --repo "$UPSTREAM"
+          # cask keeps pointing at the last good version. --signer-workflow is
+          # what makes it specific: the repository alone would also accept an
+          # artifact built by some other workflow that got added to it.
+          gh attestation verify "/tmp/$dmg" --repo "$UPSTREAM" \
+            --signer-workflow "$UPSTREAM/.github/workflows/release.yml"
+          echo "provenance verified: $dmg built by $UPSTREAM release.yml"
 
           sha="$(sha256sum "/tmp/$dmg" | cut -d' ' -f1)"
           sed -i -e "s|^  version \".*\"$|  version \"$version\"|" \
